@@ -6,22 +6,26 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
+	"github.com/joho/godotenv"
 )
 
-const API_KEY = "AIzaSyB0EdiuE2W_fVSPpfI_soLGymvDoNtA17Y"
 
-func getWeather() string{
-	url := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/manyatta%20kisumu/today?unitGroup=metric&include=events&key=J296FMANPFPLAKB9N8Q8W2YC7&contentType=json"
+
+// the getweather function is used to get the weather data from the visual crossing api which is free
+// we first create a client to make the request to the api then we get the response from the api
+// we use io.ReadAll to read the body of the response which should be a json and return it as a string
+func getWeather() string {
+	url := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/manyatta%20kisumu/today?unitGroup=metric&include=events&key="+os.Getenv("VISUAL_KEY")+"&contentType=json"
 	client := http.Client{
 		Transport: nil,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			req.URL.Opaque = req.URL.Path
 			return nil
 		},
-		
 	}
 	response, err := client.Get(url)
 	if err != nil {
@@ -35,8 +39,13 @@ func getWeather() string{
 	return string(body)
 }
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+	  log.Fatal("Error loading .env file")
+	}
+	//create a genai client to make the request to the api
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(API_KEY))
+	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -46,22 +55,20 @@ func main() {
 			log.Fatalln(err)
 		}
 	}()
-	model:=client.GenerativeModel("gemini-1.5-flash")
-	msg:="Analyze the provided JSON weather data and create a meaningful weather forecast summary for the location and date specified. Focus on the likelihood of rain, temperature range, and provide suggestions on what to wear and when to return home based on the weather conditions. Use natural language and make the forecast easy to understand."+getWeather()
-	cs:=model.StartChat()
-	resp, err:=cs.SendMessage(ctx, genai.Text(msg))
-	if err!= nil {
-        log.Fatalln(err)
-    }
-
-	for _, cand:=range resp.Candidates{
-		if cand.Content !=nil{
-			for _, part :=range cand.Content.Parts{
-				fmt.Println(part)
-            }
-		}
+	model := client.GenerativeModel("gemini-1.5-flash")
+	msg := "Analyze the provided JSON weather data and create a meaningful weather forecast summary for the location and date specified. Focus on the likelihood of rain, temperature range, and provide suggestions on what to wear and when to return home based on the weather conditions. Use natural language and make the forecast easy to understand." + getWeather()
+	cs := model.StartChat()
+	resp, err := cs.SendMessage(ctx, genai.Text(msg))
+	if err != nil {
+		log.Fatalln(err)
 	}
 
-
+	for _, cand := range resp.Candidates {
+		if cand.Content != nil {
+			for _, part := range cand.Content.Parts {
+				fmt.Println(part)
+			}
+		}
+	}
 
 }
