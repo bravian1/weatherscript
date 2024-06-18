@@ -10,7 +10,6 @@ import (
 	"os"
 
 	"github.com/google/generative-ai-go/genai"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
@@ -43,11 +42,7 @@ func getWeather() string {
 	return string(body)
 }
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
+	
 	users := []User{
 		{Name: "Bravian", Email: os.Getenv("EMAIL_BRAVIAN")},
 		{Name: "John", Email: os.Getenv("EMAIL_JOHN")},
