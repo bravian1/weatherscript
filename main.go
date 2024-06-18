@@ -42,7 +42,7 @@ func getWeather() string {
 	return string(body)
 }
 func main() {
-	
+
 	users := []User{
 		{Name: "Bravian", Email: os.Getenv("EMAIL_BRAVIAN")},
 		{Name: "John", Email: os.Getenv("EMAIL_JOHN")},
@@ -58,7 +58,7 @@ func main() {
 		smtpServer := "smtp.gmail.com"
 		port := "587"
 		auth := smtp.PlainAuth("", from, password, smtpServer)
-		err = smtp.SendMail(smtpServer+":"+port, auth, from, to, message)
+		err := smtp.SendMail(smtpServer+":"+port, auth, from, to, message)
 		if err != nil {
 			log.Fatalln(err)
 		}
