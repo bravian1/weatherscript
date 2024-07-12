@@ -82,7 +82,7 @@ func geminiWrapper(name string) []byte {
 	}()
 	model := client.GenerativeModel("gemini-1.5-flash")
 
-	msg := "My name is"+name + ". First, tell me a joke. Then, share a random programming fact about Go. Next, analyze the provided JSON weather data and create a fun and engaging weather forecast summary for the specified location and date. Focus on the likelihood of rain, temperature range, and offer amusing suggestions on what to wear and when to head back home based on the weather. Make it easy to understand and keep the tone lighthearted." + getWeather()
+	msg := "My name is " + name + ". Tell a joke first. teach me something small in a sentence about golang. Analyze the provided JSON weather data and create a meaningful weather forecast summary for the location and date specified. be funny Focus on the likelihood of rain, temperature range, and provide suggestions on what to wear and when to return home based on the weather conditions. Use natural language and make the forecast easy to understand." + getWeather()
 	cs := model.StartChat()
 	resp, err := cs.SendMessage(ctx, genai.Text(msg))
 	if err != nil {
