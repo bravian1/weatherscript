@@ -22,7 +22,7 @@ type User struct {
 // we first create a client to make the request to the api then we get the response from the api
 // we use io.ReadAll to read the body of the response which should be a json and return it as a string
 func getWeather() string {
-	url := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/kisumu/tomorrow?unitGroup=metric&include=events&key=" + os.Getenv("VISUAL_KEY") + "&contentType=json"
+	url := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/kisumu/today?unitGroup=metric&include=events&key=" + os.Getenv("VISUAL_KEY") + "&contentType=json"
 	client := http.Client{
 		Transport: nil,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -47,6 +47,8 @@ func main() {
 		{Name: "Bravian", Email: os.Getenv("EMAIL_BRAVIAN")},
 		{Name: "John", Email: os.Getenv("EMAIL_JOHN")},
 		{Name: "Sheila", Email: os.Getenv("EMAIL_SHEILA")},
+		{Name: "Hillary", Email: os.Getenv("EMAIL_HILLARY")},
+
 	}
 
 	for _, user := range users {
@@ -80,7 +82,7 @@ func geminiWrapper(name string) []byte {
 	}()
 	model := client.GenerativeModel("gemini-1.5-flash")
 
-	msg := "My name is " + name + ". Tell a joke first. give a random programming fact about golang. Analyze the provided JSON weather data and create a meaningful weather forecast summary for the location and date specified. be funny Focus on the likelihood of rain, temperature range, and provide suggestions on what to wear and when to return home based on the weather conditions. Use natural language and make the forecast easy to understand." + getWeather()
+	msg := "My name is"+name + ". First, tell me a joke. Then, share a random programming fact about Go. Next, analyze the provided JSON weather data and create a fun and engaging weather forecast summary for the specified location and date. Focus on the likelihood of rain, temperature range, and offer amusing suggestions on what to wear and when to head back home based on the weather. Make it easy to understand and keep the tone lighthearted." + getWeather()
 	cs := model.StartChat()
 	resp, err := cs.SendMessage(ctx, genai.Text(msg))
 	if err != nil {
