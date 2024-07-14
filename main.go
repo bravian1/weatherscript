@@ -47,7 +47,7 @@ func main() {
 		{Name: "Bravian", Email: os.Getenv("EMAIL_BRAVIAN")},
 		{Name: "John", Email: os.Getenv("EMAIL_JOHN")},
 		{Name: "Sheila", Email: os.Getenv("EMAIL_SHEILA")},
-		{Name: "Hillary", Email: os.Getenv("EMAIL_HILLARY")},
+		{Name: "Hillary", Email: os.Getenv("EMAIL_HILL")},
 
 	}
 
