@@ -38,6 +38,15 @@ type Joke struct {
 	Lang string `json:"lang"`
 }
 
+const baseprompt=`
+You are a cheerful and knowledgeable weather bot named Weathery. 
+Your goal is to provide accurate weather updates with a friendly and positive demeanor. 
+You brighten users' days with your sunny disposition and helpful information. 
+As you evolve, you will transform into a comprehensive newsletter, offering not just weather forecasts but also various other valuable updates and tips. 
+You always greet users warmly and make your updates fun and engaging with your enthusiasm and occasional weather-related jokes. 
+Your updates are detailed yet easy to understand, ensuring everyone is well-prepared for the day ahead. 
+You look forward to expanding your services to keep users informed and entertained on multiple topics.`
+
 func getJoke() ([]byte, error) {
 	url := "https://v2.jokeapi.dev/joke/Any?blacklistFlags=religious"
 	response, err := http.Get(url)
@@ -56,7 +65,7 @@ func getJoke() ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
-result:=joke.Setup+joke.Delivery
+result:=joke.Setup+" "+joke.Delivery
 	return []byte(result), nil
 }
 
@@ -129,18 +138,19 @@ func geminiWrapper(name string) []byte {
 	}()
 	model := client.GenerativeModel("gemini-1.5-flash")
 
-	msg := "My name is " + name + ". Provide a brief Go language tip. Next, analyze the provided JSON weather data and create a meaningful weather forecast summary for the location and date specified. The forecast should be:\n\n" +
-		"1. Personalized with the recipient's name and location.\n" +
-		"3. Mention the percent chance of rain.\n" +
-		"4. Specify the temperature range.\n" +
-		"5. Provide suggestions on what to wear and what to eat for supper that is both budget friendly and normal kenyan food.\n" +
-		"6. Use natural language and make the forecast easy to understand.\n" +
-		"7. Add emojis to make it visually appealing.\n" +
-		"8. If possible suggest an activity that can be done in kisumu if one does get out of work early.\n" +
-		"8. ask for a reply to the email if one has suggestions on what tto be included in the newsletter. yes this is a news letter\n"+
-		"9. Conclude with a positive and engaging note . eg best regards CloudNine Forecasts by bravian\n" +
+	msg := "My name is"+ name+ ". Provide a brief Go language tip. Next, analyze the provided JSON weather data and create a meaningful weather forecast summary for the location and date specified. The forecast should be:"+
+
+    "Personalized with the recipient's name and location."+
+   " Specify the temperature range and condition or just a summary of the weather."+
+   " Provide suggestions on what to wear."+
+    "Use natural language and make the forecast easy to understand."+
+    "Add emojis to make it visually appealing."+
+    "Suggest an activity that can be done in [location] if one gets out of work early."+
+    "Ask for a reply to the email if one has suggestions on what to be included in the newsletter."+
+    "Conclude with a positive and engaging note. For example: 'Best regards, CloudNine Forecasts by Bravian"+
 		getWeather()
 	cs := model.StartChat()
+	cs.SendMessage(ctx, genai.Text(baseprompt))
 	resp, err := cs.SendMessage(ctx, genai.Text(msg))
 	if err != nil {
 		log.Fatalln(err)
